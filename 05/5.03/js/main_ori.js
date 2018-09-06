@@ -1,7 +1,7 @@
 /*
 *    main.js
 *    Mastering Data Visualization with D3.js
-*    5.2 - Looping with intervals
+*    5.3 - Adding an update function
 */
 
 var margin = { left:80, right:20, top:50, bottom:100 };
@@ -15,6 +15,22 @@ var g = d3.select("#chart-area")
         .attr("height", height + margin.top + margin.bottom)
     .append("g")
         .attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
+
+var xAxisGroup = g.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height +")");
+
+var yAxisGroup = g.append("g")
+    .attr("class", "y axis");
+
+// X Scale
+var x = d3.scaleBand()
+    .range([0, width])
+    .padding(0.2);
+
+// Y Scale
+var y = d3.scaleLinear()
+    .range([height, 0]);
 
 // X Label
 g.append("text")
@@ -41,32 +57,28 @@ d3.json("data/revenues.json").then(function(data){
         d.revenue = +d.revenue;
     });
 
-    // X Scale
-    var x = d3.scaleBand()
-        .domain(data.map(function(d){ return d.month }))
-        .range([0, width])
-        .padding(0.2);
+    d3.interval(function(){
+        update(data)
+    }, 1000);
 
-    // Y Scale
-    var y = d3.scaleLinear()
-        .domain([0, d3.max(data, function(d) { return d.revenue })])
-        .range([height, 0]);
+    // Run the vis for the first time
+    update(data);
+});
+
+function update(data) {
+    x.domain(data.map(function(d){ return d.month }));
+    y.domain([0, d3.max(data, function(d) { return d.revenue })])
 
     // X Axis
     var xAxisCall = d3.axisBottom(x);
-    g.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + height +")")
-        .call(xAxisCall);
+    xAxisGroup.call(xAxisCall);;
 
     // Y Axis
     var yAxisCall = d3.axisLeft(y)
         .tickFormat(function(d){ return "$" + d; });
-    g.append("g")
-        .attr("class", "y axis")
-        .call(yAxisCall);
+    yAxisGroup.call(yAxisCall);
 
-    // Bars
+/*    // Bars
     var rects = g.selectAll("rect")
         .data(data)
         
@@ -76,20 +88,6 @@ d3.json("data/revenues.json").then(function(data){
             .attr("x", function(d){ return x(d.month) })
             .attr("height", function(d){ return height - y(d.revenue); })
             .attr("width", x.bandwidth)
-            .attr("fill", "grey");
-    //
-    // d3.interval(function(){
-    //     console.log("Hello World");
-    // }, 1000);
-
-    d3.interval(() => {
-        console.log('Hello World')
-    }, 500)
-});
-
-
-
-
-
-
+            .attr("fill", "grey");*/
+}
 
