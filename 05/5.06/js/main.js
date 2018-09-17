@@ -111,4 +111,3 @@ function update(data) {
     yLabel.text(label);
 
 }
-

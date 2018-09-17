@@ -84,6 +84,8 @@ d3.json("data/data.json").then(function(data){
         })
     });
 
+    console.log(formattedData)
+
     // Run the code every 0.1 second
     d3.interval(function(){
         // At the end of our data, loop back

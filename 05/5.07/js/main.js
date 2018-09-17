@@ -88,6 +88,7 @@ function update(data) {
         .tickFormat(function(d){ return "$" + d; });
     yAxisGroup.transition(t).call(yAxisCall);
 
+    // Second arguement tracks correctly the key.
     // JOIN new data with old elements.
     var rects = g.selectAll("rect")
         .data(data, function(d){

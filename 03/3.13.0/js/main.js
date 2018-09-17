@@ -47,7 +47,7 @@ d3.json("data/revenues.json").then( (data) => {
   // Creating scaling x, y
 
   let x = d3.scaleBand()
-    .domain(data.map((d)=> { return d.month }))
+    .domain(data.map((d) => { return d.month }))
     .range([0, width])
     .paddingInner(0.3)
     .paddingOuter(0.3)
