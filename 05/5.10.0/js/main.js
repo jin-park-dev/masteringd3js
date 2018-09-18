@@ -43,6 +43,7 @@ let yearLabel = g.append("text")
   .attr("y", height + 100)
   .attr("font-size", "15px")
 
+
 // X-Axis
 let xAxisGroup = g.append("g")
  .attr("class", "x-axis")
@@ -60,14 +61,14 @@ d3.json("data/data.json").then((data) => {
   data.forEach((d) => {
     d.year = +d.year
   })
-  console.log('Whole: data')
-  console.log(data)
-
-  console.log('First in array: data[0]')
-  console.log(data[0])
-
-  console.log('Country for year 19xx: data[0]["countries"]')
-  console.log(data[0]['countries'])
+  // console.log('Whole: data')
+  // console.log(data)
+  //
+  // console.log('First in array: data[0]')
+  // console.log(data[0])
+  //
+  // console.log('Country for year 19xx: data[0]["countries"]')
+  // console.log(data[0]['countries'])
 
   // console.log('new')
   // console.log(data.length)
@@ -83,8 +84,8 @@ d3.json("data/data.json").then((data) => {
   d3.interval(() => {
     update(data[i])
     i = (i < data.length-1) ? i+1 : 0
-    console.log(i)
-    console.log("updated")
+    // console.log(i)
+    // console.log("updated")
   }, 200)
 
 })
@@ -97,20 +98,20 @@ function update(data) {
 
   // Creating scaling x, y
 
-  console.log("data in update function")
-  console.log(data)
+  // console.log("data in update function")
+  // console.log(data)
 
   let year = data.year
   data = data['countries']
 
-  console.log('year')
-  console.log(year)
-  console.log("data[countries]")
-  console.log(data["countries"])
+  // console.log('year')
+  // console.log(year)
+  // console.log("data[countries]")
+  // console.log(data["countries"])
 
-  let x = d3.scaleBand()
-    .domain(data.map((d) => { return d.income }))
-    // .domain([0, 50000])
+  let x = d3.scaleLog()
+    // .domain(data.map((d) => { return d.income }))
+    .domain([300, 150000])
     .range([0, width])
     // .paddingInner(0.3)
     // .paddingOuter(0.3)
@@ -131,10 +132,10 @@ function update(data) {
   let continentColor = d3.scaleOrdinal(d3.schemePastel1);
 
   // Creating axis
-
   let xAxisCall = d3.axisBottom(x)
+    .tickValues([400, 4000, 40000])
+    .tickFormat(d3.format("$"));
   xAxisGroup.call(xAxisCall)
-  //
   //
   let yAxisCall = d3.axisLeft(y)
     .ticks(10)
@@ -145,6 +146,8 @@ function update(data) {
   //
   // Update pattern
   //
+
+  let t = d3.transition().duration(100)
 
   // JOIN Data
 
@@ -179,15 +182,16 @@ function update(data) {
     //   return height - y(d.life_exp)
     // })
     // .attr("r", 8)
-    .attr("fill", (d) => { console.log(d.continent); return continentColor(d.continent) })
-    .attr("fill-opacity", 0)
+    .attr("class", "enter")
+    .attr("fill", (d) => { return continentColor(d.continent) })
+    // .attr("fill-opacity", 0)
     .merge(circles)
-    .transition(d3.transition().duration(100)) //???ms transition
+    .transition(t) //???ms transition
       .attr("cx", (d) => {
         // console.log("income")
         // console.log(d.income)
         // console.log(x(d.income))
-        return x(d.income) + x.bandwidth() / 2})
+        return x(d.income)})
       .attr("cy", (d) => {
         // console.log("life_exp")
         // console.log(d.life_exp)
@@ -198,7 +202,7 @@ function update(data) {
         // console.log(r(d.population))
         return r(d.population)
       })
-      .attr("fill-opacity", 0.8)
+      // .attr("fill-opacity", 0.8)
 
   yearLabel.text(year)
 }
