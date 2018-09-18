@@ -38,10 +38,12 @@ g.append("text")
 
 // Year Label
 let yearLabel = g.append("text")
-  .attr("class", "year label")
-  .attr("x", width - 100)
-  .attr("y", height + 100)
-  .attr("font-size", "15px")
+  .attr("x", width - 40)
+  .attr("y", height - 10)
+  .attr("font-size", "40px")
+  .attr("opacity", "0.4")
+  .attr("text-anchor", "middle")
+
 
 
 // X-Axis
@@ -61,6 +63,7 @@ d3.json("data/data.json").then((data) => {
   data.forEach((d) => {
     d.year = +d.year
   })
+
   // console.log('Whole: data')
   // console.log(data)
   //
@@ -123,11 +126,12 @@ function update(data) {
     .domain([0, 90])
     .range([height, 0])
 
-  let r = d3.scaleLinear()
+  let area = d3.scaleLinear()
     .domain([0, d3.max(data, (d) => {
       return d.population
     })])
-    .range([1, 30])
+    // .range([5, 25])
+    .range([25*Math.PI, 1500*Math.PI])
 
   let continentColor = d3.scaleOrdinal(d3.schemePastel1);
 
@@ -200,7 +204,7 @@ function update(data) {
       .attr("r", (d) => {
         // console.log(d.population)
         // console.log(r(d.population))
-        return r(d.population)
+        return Math.sqrt(area(d.population) / Math.PI)
       })
       // .attr("fill-opacity", 0.8)
 
