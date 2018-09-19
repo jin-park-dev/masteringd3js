@@ -69,6 +69,9 @@ d3.json("data/example.json").then(function(data) {
     xAxis.call(xAxisCall.scale(x))
     yAxis.call(yAxisCall.scale(y))
 
+  console.log(data)
+  console.log(line(data))
+
     // Add line to chart
     g.append("path")
         .attr("class", "line")
