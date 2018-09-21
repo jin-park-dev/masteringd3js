@@ -181,7 +181,7 @@ function update() {
     line = d3.line()
         .x(function(d){ return x(d.date); })
         .y(function(d){ return y(d[yValue]); });
-    console.log(line(dataTimeFiltered))
+    // console.log(line(dataTimeFiltered))
     // Update our line path
     g.select(".line")
         .transition(t)

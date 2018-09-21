@@ -39,20 +39,39 @@ var xAxis = g.append("g")
 var yAxis = g.append("g")
   .attr("class", "y axis")
 
+// X-Axis label
+let xAxisLabel = g.append("text")
+  .attr("class", "axis-title")
+  .attr("x", width/2)
+  .attr("y", height + 55)
+  .attr("font-size", "20px")
+  .attr("text-anchor", "middle")
+
 // Y-Axis label
-yAxis.append("text")
+let yAxixLabel = g.append("text")
   .attr("class", "axis-title")
   .attr("transform", "rotate(-90)")
-  .attr("y", 6)
+  .attr("x", -height/2)
+  .attr("y", -60)
   .attr("dy", ".71em")
+  .attr("font-size", "20px")
   .style("text-anchor", "end")
   .attr("fill", "#5D6971")
-  .text("Price (USD)");
 
-// Line path generator
-var line = d3.line()
-  .x(function(d) { return x(d.date); })
-  .y(function(d) { return y(d.price_usd); });
+
+// Add line to chart
+g.append("path")
+  .attr("class", "line")
+  .attr("fill", "none")
+  .attr("stroke", "grey")
+  .attr("stroke-with", "3px")
+
+
+///
+/// JSON GET ///
+///
+
+let dataAll
 
 d3.json("data/coins.json").then(function(data) {
   // Data cleaning
@@ -77,27 +96,56 @@ d3.json("data/coins.json").then(function(data) {
     });
   }
 
-  data = filteredData['bitcoin']
+  data = filteredData
+  dataAll = data
 
   console.log(data)
 
+  update(data)
+
+});
+
+
+let coinSelect = document.getElementById("coin-select")
+coinSelect.onchange = () => {
+  update(dataAll)
+}
+let varSelect = document.getElementById("var-select")
+varSelect.onchange = () => {
+  update(dataAll)
+}
+
+// $("#coin-select").on("change", update(dataAll))
+
+
+function update(data) {
+  let coin = document.getElementById("coin-select").value
+  let yValue = document.getElementById("var-select").value
+
+  console.log(coin)
+  data = data[coin]
   // Set scale domains
   x.domain(d3.extent(data, function(d) { return d.date; }));
-  y.domain([d3.min(data, function(d) { return d.price_usd; }) / 1.005,
-    d3.max(data, function(d) { return d.price_usd; }) * 1.005]);
+  y.domain([d3.min(data, function(d) { return d[yValue]; }) / 1.005,
+    d3.max(data, function(d) { return d[yValue]; }) * 1.005]);
 
   // Generate axes once scales have been set
   xAxis.call(xAxisCall.scale(x))
   yAxis.call(yAxisCall.scale(y))
+
+
+  // Line path generator
+  var line = d3.line()
+    .x(function(d) { return x(d.date); })
+    .y(function(d) { return y(d[yValue]); });
   console.log(line(data))
 
-  // Add line to chart
-  g.append("path")
-    .attr("class", "line")
-    .attr("fill", "none")
-    .attr("stroke", "grey")
-    .attr("stroke-with", "3px")
+
+  g.select(".line")
     .attr("d", line(data));
+
+  xAxisLabel.text("hix")
+  yAxixLabel.text("hiy")
 
   /******************************** Tooltip Code ********************************/
 
@@ -135,15 +183,14 @@ d3.json("data/coins.json").then(function(data) {
       i = bisectDate(data, x0, 1),
       d0 = data[i - 1],
       d1 = data[i],
-      d = x0 - d0.year > d1.year - x0 ? d1 : d0;
-    focus.attr("transform", "translate(" + x(d.year) + "," + y(d.value) + ")");
-    focus.select("text").text(d.value);
-    focus.select(".x-hover-line").attr("y2", height - y(d.value));
-    focus.select(".y-hover-line").attr("x2", -x(d.year));
+      d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+    focus.attr("transform", "translate(" + x(d.date) + "," + y(d[yValue]) + ")");
+    focus.select("text").text(d[yValue]);
+    focus.select(".x-hover-line").attr("y2", height - y(d[yValue]));
+    focus.select(".y-hover-line").attr("x2", -x(d.date));
   }
 
 
   /******************************** Tooltip Code ********************************/
 
-});
-
+}
